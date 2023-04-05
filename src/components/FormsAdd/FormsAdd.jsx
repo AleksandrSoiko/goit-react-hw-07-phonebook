@@ -2,16 +2,17 @@ import { Formik, Field } from 'formik';
 import { Form, FormField, SubmitBtn, ErrorMessage } from './FormsAdd.styled';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import { addContact } from 'redux/contactsSlice/contactsSlice';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { getContacts } from 'redux/selectors';
+import { addContact } from 'redux/operations';
 
 const ContactSchema = Yup.object().shape({
   name: Yup.string()
     .min(3, 'Too Short!')
     .max(15, 'Too Long!')
     .required('Required'),
-  number: Yup.number('')
+  phone: Yup.number('')
     .typeError(
       'Phone number must be digits and can contain spaces, dashes, parentheses and can start with +'
     )
@@ -21,7 +22,7 @@ const ContactSchema = Yup.object().shape({
 
 export const ContactForm = () => {
   const dispatch = useDispatch();
-  const contacts = useSelector(state => state.contacts.phones);
+  const contacts = useSelector(getContacts);
   const notify = () => toast('Such contact is already existed');
 
   return (
@@ -30,12 +31,12 @@ export const ContactForm = () => {
       <Formik
         initialValues={{
           name: '',
-          number: '',
+          phone: '',
         }}
         validationSchema={ContactSchema}
         onSubmit={(values, action) => {
           for (const contact of contacts) {
-            if (contact.number === values.number) {
+            if (contact.phone === values.phone) {
               notify();
               action.resetForm();
               return;
@@ -53,8 +54,8 @@ export const ContactForm = () => {
           </FormField>
           <FormField>
             Number
-            <Field name="number"></Field>
-            <ErrorMessage name="number" component="span" />
+            <Field name="phone"></Field>
+            <ErrorMessage name="phone" component="span" />
           </FormField>
           <SubmitBtn type="submit">Add contact</SubmitBtn>
         </Form>

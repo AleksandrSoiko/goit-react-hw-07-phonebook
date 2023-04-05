@@ -1,30 +1,49 @@
-import { nanoid } from 'nanoid';
-import { List } from './ListContacts.styled';
+import { List, Error, Loading } from './ListContacts.styled';
 import { ContactItem } from 'components/ItemContact/ItemContact';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteContact } from 'redux/contactsSlice/contactsSlice';
+import { useEffect } from 'react';
+import { deleteContact, fetchContacts } from 'redux/operations';
+import {
+  getContacts,
+  getError,
+  getFilter,
+  getStatus,
+  getVisibleContact,
+} from 'redux/selectors';
 
 export const ListContact = () => {
-  const contacts = useSelector(state => state.contacts.phones);
   const dispatch = useDispatch();
-  const filter = useSelector(state => state.filter);
-  const visibleContact = [...contacts].filter(contact =>
-    contact.name.toLowerCase().includes(filter)
-  );
+  const contacts = useSelector(getContacts);
+  const filter = useSelector(getFilter);
+  const visibleContact = getVisibleContact(contacts, filter);
+  const status = useSelector(getStatus);
+  const error = useSelector(getError);
+
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
+
   return (
-    <List>
-      {visibleContact.map(contact => {
-        return (
-          <ContactItem
-            key={nanoid()}
-            name={contact.name}
-            contact={contact.number}
-            onDelete={() => {
-              dispatch(deleteContact(contact.id));
-            }}
-          />
-        );
-      })}
-    </List>
+    <>
+      {error !== null && <Error>`${error}`</Error>}
+      {status && <Loading>Request is loading...</Loading>}
+
+      {contacts.length !== 0 && (
+        <List>
+          {visibleContact.map(contact => {
+            return (
+              <ContactItem
+                key={contact.id}
+                name={contact.name}
+                contact={contact.phone}
+                onDelete={() => {
+                  dispatch(deleteContact(contact.id));
+                }}
+              />
+            );
+          })}
+        </List>
+      )}
+    </>
   );
 };

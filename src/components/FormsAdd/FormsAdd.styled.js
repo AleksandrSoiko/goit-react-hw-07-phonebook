@@ -8,6 +8,7 @@ export const Form = styled(FormikForm)`
   display: flex;
   flex-direction: column;
   gap: 12px;
+  background-color: lightgrey;
 `;
 
 export const FormField = styled.label`

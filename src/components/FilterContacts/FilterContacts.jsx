@@ -6,6 +6,7 @@ export const Filter = () => {
   const dispatch = useDispatch();
   const handleChange = e => {
     dispatch(updateFilter(e.currentTarget.value.toLowerCase().trim()));
+    console.log(e.currentTarget.value);
   };
   return (
     <Label>
